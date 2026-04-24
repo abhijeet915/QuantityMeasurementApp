@@ -3,7 +3,9 @@ public class QuantityMeasurementApp {
     // ---------------- ENUM FOR UNITS ----------------
     enum LengthUnit {
         FEET(1.0),
-        INCH(1.0 / 12.0); // 1 inch = 1/12 feet
+        INCH(1.0 / 12.0),
+        YARDS(3.0),
+        CENTIMETERS(0.0328084); // 1 cm = 0.0328084 feet
 
         private final double toFeetFactor;
 
@@ -29,22 +31,18 @@ public class QuantityMeasurementApp {
             this.unit = unit;
         }
 
-        // Convert to base unit (feet)
         private double toFeet() {
             return unit.toFeet(value);
         }
 
         @Override
         public boolean equals(Object obj) {
-            // Reflexive
             if (this == obj) return true;
 
-            // Null & type check
             if (obj == null || getClass() != obj.getClass()) return false;
 
             Quantity other = (Quantity) obj;
 
-            // Compare after conversion
             return Double.compare(this.toFeet(), other.toFeet()) == 0;
         }
 
@@ -57,19 +55,35 @@ public class QuantityMeasurementApp {
     // ---------------- MAIN METHOD ----------------
     public static void main(String[] args) {
 
-        // Same unit equality
-        Quantity q1 = new Quantity(1.0, LengthUnit.FEET);
-        Quantity q2 = new Quantity(1.0, LengthUnit.FEET);
+        // Yard comparisons
+        Quantity q1 = new Quantity(1.0, LengthUnit.YARDS);
+        Quantity q2 = new Quantity(3.0, LengthUnit.FEET);
+        Quantity q3 = new Quantity(36.0, LengthUnit.INCH);
 
-        // Cross-unit equality
-        Quantity q3 = new Quantity(12.0, LengthUnit.INCH);
+        System.out.println("1 yard == 3 feet: " + q1.equals(q2));
+        System.out.println("1 yard == 36 inches: " + q1.equals(q3));
 
-        // Different values
-        Quantity q4 = new Quantity(2.0, LengthUnit.FEET);
+        // Same unit
+        Quantity q4 = new Quantity(2.0, LengthUnit.YARDS);
+        Quantity q5 = new Quantity(2.0, LengthUnit.YARDS);
 
-        System.out.println("Feet vs Feet (1.0 == 1.0): " + q1.equals(q2));
-        System.out.println("Feet vs Inches (1 ft == 12 in): " + q1.equals(q3));
-        System.out.println("Different values (1 ft != 2 ft): " + q1.equals(q4));
+        System.out.println("2 yards == 2 yards: " + q4.equals(q5));
+
+        // Centimeter comparisons
+        Quantity q6 = new Quantity(1.0, LengthUnit.CENTIMETERS);
+        Quantity q7 = new Quantity(0.393701, LengthUnit.INCH);
+
+        System.out.println("1 cm == 0.393701 inches: " + q6.equals(q7));
+
+        // Negative test
+        Quantity q8 = new Quantity(1.0, LengthUnit.CENTIMETERS);
+        Quantity q9 = new Quantity(1.0, LengthUnit.FEET);
+
+        System.out.println("1 cm != 1 foot: " + q8.equals(q9));
+
+        // Transitive property
+        System.out.println("Transitive (yard == feet == inches): " +
+                (q1.equals(q2) && q2.equals(q3) && q1.equals(q3)));
 
         // Edge cases
         System.out.println("Null comparison: " + q1.equals(null));
